@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WP GeoScale - Documentation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 40px 20px; background: #f9f9f9; }
+        .container { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1, h2, h3 { color: #111; border-bottom: 1px solid #eaeaea; padding-bottom: 10px; }
+        h1 { font-size: 2.5em; border-bottom: 2px solid #0073aa; color: #0073aa; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; border: 1px solid #ddd; }
+        code { font-family: Consolas, Monaco, 'Andale Mono', monospace; background: #f4f4f4; padding: 2px 5px; border-radius: 3px; color: #d63638; }
+        .callout { background: #e7f5ff; border-left: 4px solid #0073aa; padding: 15px; margin: 20px 0; border-radius: 0 4px 4px 0; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WP GeoScale Documentation</h1>
+        <p>Welcome to WP GeoScale, the enterprise programmatic SEO engine for WordPress. This guide covers installation, configuration, and campaign management.</p>
+
+        <h2>1. Installation</h2>
+        <p>Installing WP GeoScale is just like installing any premium WordPress plugin:</p>
+        <ol>
+            <li>Log into your WordPress Admin Dashboard.</li>
+            <li>Navigate to <strong>Plugins > Add New</strong>.</li>
+            <li>Click <strong>Upload Plugin</strong> at the top of the screen.</li>
+            <li>Choose the <code>wp-geoscale.zip</code> file and click <strong>Install Now</strong>.</li>
+            <li>Click <strong>Activate Plugin</strong>.</li>
+        </ol>
+        <div class="callout">
+            <strong>Important:</strong> Upon activation, WP GeoScale automatically sets up highly optimized custom database tables (<code>wp_geoscale_routes</code> and <code>wp_geoscale_tasks</code>) to handle thousands of pages without bloating your default WordPress tables.
+        </div>
+
+        <h2>2. CSV Formatting Rules</h2>
+        <p>Your CSV file is the fuel for your programmatic SEO campaign. WP GeoScale strictly requires one specific column, but allows unlimited custom data columns.</p>
+        
+        <h3>Required Column</h3>
+        <ul>
+            <li><code>route_slug</code>: This column dictates the URL of the generated page. (e.g., if you write <code>plumber-new-york</code>, the page will be generated at <code>yoursite.com/plumber-new-york/</code>).</li>
+        </ul>
+
+        <h3>Custom Data Columns</h3>
+        <p>You can add as many columns as you want to inject dynamic data into your pages.</p>
+        <table>
+            <tr>
+                <th>route_slug (Required)</th>
+                <th>city</th>
+                <th>phone_number</th>
+            </tr>
+            <tr>
+                <td>plumber-new-york</td>
+                <td>New York</td>
+                <td>555-0101</td>
+            </tr>
+            <tr>
+                <td>plumber-chicago</td>
+                <td>Chicago</td>
+                <td>555-0202</td>
+            </tr>
+        </table>
+
+        <h2>3. Shortcode Usage & Spintax</h2>
+        <p>To display your CSV data inside your WordPress "Master Template" page, use the GeoScale shortcode.</p>
+
+        <h3>Basic Shortcode</h3>
+        <p><code>[geoscale field="city" default="your area"]</code></p>
+        <p>This will output the value from the "city" column of your CSV. If the column is empty, it will gracefully fallback to "your area".</p>
+
+        <h3>The Spintax Engine</h3>
+        <p>To avoid duplicate content penalties from Google, WP GeoScale features a native Spintax engine. You can format your CSV data using curly braces and pipes.</p>
+        <p><strong>Example CSV Data:</strong> <code>{Fast|Reliable|Expert} Plumbers in {New York|NYC}</code></p>
+        <p>When the page is rendered, WP GeoScale will randomly pick one of the variations for that specific route (e.g., "Reliable Plumbers in NYC").</p>
+
+        <h2>4. Task & Campaign Management</h2>
+        <p>The WP GeoScale React Dashboard provides enterprise-level tools to manage massive datasets.</p>
+        
+        <h3>Uploading a Campaign</h3>
+        <ol>
+            <li>Go to <strong>WP GeoScale > New Upload</strong>.</li>
+            <li>Select the WordPress Page you want to use as your <strong>Master Template</strong> from the dynamic dropdown.</li>
+            <li>Upload your CSV file.</li>
+            <li>Background workers (Action Scheduler) will process the file in chunks of 500 rows. You can safely leave the page; the processing will not timeout!</li>
+        </ol>
+
+        <h3>Bulk Actions</h3>
+        <p>Navigate to the <strong>Campaigns</strong> tab to view all your historical uploads. Click on a campaign name to view its generated routes.</p>
+        <ul>
+            <li><strong>Activate All / Deactivate All:</strong> Temporarily hide thousands of routes from public view instantly.</li>
+            <li><strong>Delete Campaign:</strong> Instantly wipe the campaign and all its associated URLs from the database to keep your server clean.</li>
+        </ul>
+
+        <h2>5. Dynamic JSON-LD Schema</h2>
+        <p>Local SEO requires Schema markup. Navigate to the <strong>SEO Schema</strong> tab in the dashboard. You can paste your JSON-LD template and inject shortcodes directly into it!</p>
+        <pre><code>{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Plumbers in [geoscale field=&quot;city&quot;]",
+  "telephone": "[geoscale field=&quot;phone_number&quot;]"
+}</code></pre>
+        <p>The plugin will automatically parse and inject this schema into the <code>&lt;head&gt;</code> of every generated page.</p>
+
+    </div>
+</body>
+</html>
