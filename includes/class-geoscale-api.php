@@ -110,6 +110,12 @@ class GeoScale_API {
 		if ( $total_rows > 0 ) {
 			global $wpdb;
 			$tasks_table = GeoScale_DB::get_tasks_table_name();
+
+			// Auto-create tables if they are missing to prevent DB errors breaking the JSON response
+			if ( $wpdb->get_var( "SHOW TABLES LIKE '$tasks_table'" ) != $tasks_table ) {
+				GeoScale_DB::create_table();
+			}
+
 			$wpdb->insert(
 				$tasks_table,
 				array(
