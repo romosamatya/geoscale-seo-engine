@@ -18,8 +18,8 @@ class GeoScale_Admin {
 
 	public function add_plugin_admin_menu() {
 		add_menu_page(
-			'WP GeoScale V2',
-			'GeoScale V2',
+			'WP GeoScale',
+			'GeoScale',
 			'manage_options',
 			'wp-geoscale',
 			array( $this, 'display_react_container' ),

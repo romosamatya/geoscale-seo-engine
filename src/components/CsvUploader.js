@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadCsv, clearMessages } from '../store/uploadSlice';
+
+const { root, nonce } = window.geoscaleApiData || { root: '', nonce: '' };
 
 const CsvUploader = () => {
     const dispatch = useDispatch();
@@ -8,11 +10,29 @@ const CsvUploader = () => {
     
     const [file, setFile] = useState(null);
     const [templateId, setTemplateId] = useState('');
+    const [pages, setPages] = useState([]);
+    const [loadingPages, setLoadingPages] = useState(true);
+
+    useEffect(() => {
+        // Fetch published pages from WP REST API
+        fetch(`${root}wp/v2/pages?per_page=100`, { headers: { 'X-WP-Nonce': nonce } })
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setPages(data);
+                }
+                setLoadingPages(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoadingPages(false);
+            });
+    }, []);
 
     const handleUpload = (e) => {
         e.preventDefault();
         if (!file || !templateId) {
-            alert('Please select a file and a template ID.');
+            alert('Please select a file and a template page.');
             return;
         }
 
@@ -34,15 +54,24 @@ const CsvUploader = () => {
 
             <form onSubmit={handleUpload}>
                 <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Master Template ID</label>
-                    <input 
-                        type="number" 
-                        value={templateId} 
-                        onChange={(e) => setTemplateId(e.target.value)} 
-                        placeholder="e.g. 15"
-                        required 
-                        style={{ padding: '5px' }}
-                    />
+                    <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>Master Template Page</label>
+                    {loadingPages ? (
+                        <p>Loading pages...</p>
+                    ) : (
+                        <select 
+                            value={templateId} 
+                            onChange={(e) => setTemplateId(e.target.value)} 
+                            required 
+                            style={{ padding: '5px', width: '100%', maxWidth: '400px' }}
+                        >
+                            <option value="">-- Select a Page --</option>
+                            {pages.map(page => (
+                                <option key={page.id} value={page.id}>
+                                    {page.title.rendered} (ID: {page.id})
+                                </option>
+                            ))}
+                        </select>
+                    )}
                 </div>
                 <div style={{ marginBottom: '15px' }}>
                     <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>CSV File</label>

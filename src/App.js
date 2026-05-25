@@ -28,7 +28,7 @@ const App = () => {
     if (activeTaskId) {
         return (
             <div className="geoscale-app-container" style={{ padding: '20px', maxWidth: '1000px' }}>
-                <h1>WP GeoScale 3.0 Dashboard</h1>
+                <h1>WP GeoScale Dashboard</h1>
                 <CampaignDetails />
             </div>
         );
@@ -36,7 +36,7 @@ const App = () => {
 
     return (
         <div className="geoscale-app-container" style={{ padding: '20px', maxWidth: '1000px' }}>
-            <h1>WP GeoScale 3.0 Dashboard</h1>
+            <h1>WP GeoScale Dashboard</h1>
             
             <h2 className="nav-tab-wrapper" style={{ marginBottom: '20px' }}>
                 <a href="#" className={`nav-tab ${currentTab === 'campaigns' ? 'nav-tab-active' : ''}`} onClick={(e) => { e.preventDefault(); setCurrentTab('campaigns'); }}>Campaigns</a>
