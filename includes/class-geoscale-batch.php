@@ -13,13 +13,13 @@ class GeoScale_Batch {
 
 	public function init() {
 		// Note: Action scheduler hooks pass the exact args array elements as separate parameters
-		add_action( 'geoscale_process_csv_chunk', array( $this, 'process_chunk' ), 10, 4 );
+		add_action( 'geoscale_process_csv_chunk', array( $this, 'process_chunk' ), 10, 5 );
 	}
 
 	/**
 	 * Schedule the chunks for processing.
 	 */
-	public static function schedule_csv_processing( $file_path, $template_post_id, $total_rows ) {
+	public static function schedule_csv_processing( $file_path, $template_post_id, $total_rows, $task_id ) {
 		$chunk_size = 500;
 		$chunks = ceil( $total_rows / $chunk_size );
 
@@ -32,6 +32,7 @@ class GeoScale_Batch {
 					'template_post_id' => $template_post_id,
 					'offset'           => $offset,
 					'limit'            => $chunk_size,
+					'task_id'          => $task_id,
 				),
 				'geoscale_batch'
 			);
@@ -41,7 +42,7 @@ class GeoScale_Batch {
 	/**
 	 * Process a specific chunk of the CSV.
 	 */
-	public function process_chunk( $file_path, $template_post_id, $offset, $limit ) {
+	public function process_chunk( $file_path, $template_post_id, $offset, $limit, $task_id ) {
 		if ( ! file_exists( $file_path ) ) {
 			return;
 		}
@@ -81,22 +82,26 @@ class GeoScale_Batch {
 				$wpdb->replace(
 					$table_name,
 					array(
+						'task_id'          => $task_id,
 						'route_slug'       => $route_slug,
 						'template_post_id' => $template_post_id,
 						'dynamic_data'     => $dynamic_data,
 						'is_active'        => 1,
 					),
-					array( '%s', '%d', '%s', '%d' )
+					array( '%d', '%s', '%d', '%s', '%d' )
 				);
 				
 				$processed++;
 			}
 
+			$is_eof = feof( $handle );
 			fclose( $handle );
 
-			// Cleanup file on last chunk
-			if ( $processed < $limit ) {
+			// Cleanup file on last chunk and mark task completed
+			if ( $is_eof || $processed < $limit ) {
 				@unlink( $file_path );
+				$tasks_table = GeoScale_DB::get_tasks_table_name();
+				$wpdb->update( $tasks_table, array( 'status' => 'completed' ), array( 'id' => $task_id ) );
 			}
 		}
 	}

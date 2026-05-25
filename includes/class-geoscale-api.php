@@ -42,6 +42,25 @@ class GeoScale_API {
 				'permission_callback' => array( $this, 'permissions_check' ),
 			),
 		) );
+
+		// V3 Routes for Tasks Management
+		register_rest_route( $namespace, '/tasks', array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => array( $this, 'get_tasks' ),
+			'permission_callback' => array( $this, 'permissions_check' ),
+		) );
+
+		register_rest_route( $namespace, '/tasks/(?P<id>\d+)/routes', array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => array( $this, 'get_task_routes' ),
+			'permission_callback' => array( $this, 'permissions_check' ),
+		) );
+
+		register_rest_route( $namespace, '/tasks/bulk-action', array(
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => array( $this, 'bulk_action' ),
+			'permission_callback' => array( $this, 'permissions_check' ),
+		) );
 	}
 
 	public function permissions_check() {
@@ -89,7 +108,20 @@ class GeoScale_API {
 		}
 
 		if ( $total_rows > 0 ) {
-			GeoScale_Batch::schedule_csv_processing( $file_path, absint( $template_post_id ), $total_rows );
+			global $wpdb;
+			$tasks_table = GeoScale_DB::get_tasks_table_name();
+			$wpdb->insert(
+				$tasks_table,
+				array(
+					'task_name'        => sanitize_file_name( $file['name'] ),
+					'template_post_id' => absint( $template_post_id ),
+					'row_count'        => $total_rows,
+					'status'           => 'processing',
+				)
+			);
+			$task_id = $wpdb->insert_id;
+
+			GeoScale_Batch::schedule_csv_processing( $file_path, absint( $template_post_id ), $total_rows, $task_id );
 		}
 
 		return rest_ensure_response( array(
@@ -131,5 +163,75 @@ class GeoScale_API {
 		$schema = $request->get_param( 'schema' );
 		update_option( 'geoscale_schema_template', $schema );
 		return rest_ensure_response( array( 'success' => true, 'message' => 'Schema saved successfully.' ) );
+	}
+
+	// --- V3 Task Endpoints ---
+
+	public function get_tasks() {
+		global $wpdb;
+		$tasks_table = GeoScale_DB::get_tasks_table_name();
+
+		if ( $wpdb->get_var("SHOW TABLES LIKE '$tasks_table'") != $tasks_table ) {
+			return rest_ensure_response( array() );
+		}
+
+		$tasks = $wpdb->get_results( "SELECT * FROM {$tasks_table} ORDER BY created_at DESC" );
+		return rest_ensure_response( $tasks );
+	}
+
+	public function get_task_routes( WP_REST_Request $request ) {
+		global $wpdb;
+		$table_name = GeoScale_DB::get_table_name();
+		
+		$task_id = $request->get_param( 'id' );
+		$page    = max( 1, absint( $request->get_param( 'page' ) ) );
+		$per_page = 50;
+		$search  = sanitize_text_field( $request->get_param( 'search' ) );
+
+		$offset = ( $page - 1 ) * $per_page;
+		$where = $wpdb->prepare( "WHERE task_id = %d", $task_id );
+
+		if ( ! empty( $search ) ) {
+			$where .= $wpdb->prepare( " AND route_slug LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
+		}
+
+		$total = $wpdb->get_var( "SELECT COUNT(id) FROM {$table_name} {$where}" );
+		$routes = $wpdb->get_results( "SELECT id, route_slug, is_active, dynamic_data FROM {$table_name} {$where} ORDER BY id ASC LIMIT {$per_page} OFFSET {$offset}" );
+
+		// Decode dynamic_data for the frontend preview
+		foreach ( $routes as &$route ) {
+			$route->dynamic_data = json_decode( $route->dynamic_data );
+		}
+
+		return rest_ensure_response( array(
+			'routes' => $routes,
+			'total'  => (int) $total,
+			'pages'  => ceil( $total / $per_page ),
+		) );
+	}
+
+	public function bulk_action( WP_REST_Request $request ) {
+		global $wpdb;
+		$table_name = GeoScale_DB::get_table_name();
+		$tasks_table = GeoScale_DB::get_tasks_table_name();
+
+		$task_id = absint( $request->get_param( 'task_id' ) );
+		$action  = sanitize_text_field( $request->get_param( 'action' ) );
+
+		if ( ! $task_id || ! in_array( $action, array( 'activate', 'deactivate', 'delete' ) ) ) {
+			return new WP_Error( 'invalid_params', 'Invalid parameters.', array( 'status' => 400 ) );
+		}
+
+		if ( 'delete' === $action ) {
+			$wpdb->delete( $table_name, array( 'task_id' => $task_id ) );
+			$wpdb->delete( $tasks_table, array( 'id' => $task_id ) );
+			$message = 'Campaign and all associated routes deleted successfully.';
+		} else {
+			$is_active = ( 'activate' === $action ) ? 1 : 0;
+			$wpdb->update( $table_name, array( 'is_active' => $is_active ), array( 'task_id' => $task_id ) );
+			$message = "All routes successfully " . ( 'activate' === $action ? 'activated' : 'deactivated' ) . ".";
+		}
+
+		return rest_ensure_response( array( 'success' => true, 'message' => $message ) );
 	}
 }
