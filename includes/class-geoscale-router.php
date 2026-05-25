@@ -27,6 +27,7 @@ class GeoScale_Router {
 		add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
 		add_action( 'template_redirect', array( $this, 'intercept_request' ) );
 		add_filter( 'template_include', array( $this, 'load_master_template' ) );
+		add_action( 'save_post', array( $this, 'purge_cache_on_save' ) );
 	}
 
 	/**
@@ -168,5 +169,29 @@ class GeoScale_Router {
 		}
 		
 		return $template;
+	}
+
+	/**
+	 * Purge object cache for virtual routes when their master template is updated.
+	 */
+	public function purge_cache_on_save( $post_id ) {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		global $wpdb;
+		$table_name = GeoScale_DB::get_table_name();
+
+		$routes = $wpdb->get_col( $wpdb->prepare(
+			"SELECT route_slug FROM {$table_name} WHERE template_post_id = %d",
+			$post_id
+		) );
+
+		if ( ! empty( $routes ) ) {
+			foreach ( $routes as $slug ) {
+				$cache_key = 'geoscale_route_' . md5( $slug );
+				wp_cache_delete( $cache_key, 'geoscale' );
+			}
+		}
 	}
 }

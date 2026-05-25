@@ -26,6 +26,9 @@ class GeoScale_SEO {
 
 		// Core WordPress Sitemaps Integration
 		add_action( 'init', array( $this, 'register_sitemap_provider' ) );
+
+		// Dynamic Schema JSON-LD injection
+		add_action( 'wp_head', array( $this, 'inject_json_ld' ) );
 	}
 
 	/**
@@ -78,5 +81,27 @@ class GeoScale_SEO {
 			require_once plugin_dir_path( __FILE__ ) . 'class-geoscale-sitemap-provider.php';
 			wp_register_sitemap_provider( 'geoscale_routes', new GeoScale_Sitemap_Provider() );
 		}
+	}
+
+	/**
+	 * Inject dynamic JSON-LD schema into the head.
+	 */
+	public function inject_json_ld() {
+		if ( empty( GeoScale_Router::$current_route_data ) ) {
+			return;
+		}
+
+		$schema_template = get_option( 'geoscale_schema_template', '' );
+		if ( empty( $schema_template ) ) {
+			return;
+		}
+
+		// Process shortcodes within the schema template
+		$parsed_schema = do_shortcode( $schema_template );
+		
+		echo "\n<!-- WP GeoScale JSON-LD Schema -->\n";
+		echo "<script type=\"application/ld+json\">\n";
+		echo $parsed_schema . "\n";
+		echo "</script>\n<!-- End WP GeoScale Schema -->\n";
 	}
 }

@@ -25,6 +25,10 @@ define( 'WP_GEOSCALE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 /**
  * Load core dependencies.
  */
+if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	require_once WP_GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php';
+}
+
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
 
 /**
@@ -57,6 +61,14 @@ function run_wp_geoscale() {
 		$plugin_admin = new GeoScale_Admin();
 		$plugin_admin->init();
 	}
+
+	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
+	$plugin_api = new GeoScale_API();
+	$plugin_api->init();
+
+	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-batch.php';
+	$plugin_batch = new GeoScale_Batch();
+	$plugin_batch->init();
 
 	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
 	$plugin_router = new GeoScale_Router();
