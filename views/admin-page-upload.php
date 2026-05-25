@@ -19,11 +19,6 @@ $templates = get_posts( array(
 	'order'          => 'ASC',
 ) );
 ?>
-<div class="wrap">
-	<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-	
-	<?php settings_errors( 'geoscale_messages' ); ?>
-
 	<div class="card" style="max-width: 600px; padding: 20px; margin-top: 20px;">
 		<h2>Upload Data CSV</h2>
 		<p>Upload a CSV file to generate virtual routes. The CSV <strong>must</strong> contain a column named <code>route_slug</code> which will be used for the URL (e.g., <code>new-york-city</code>).</p>
@@ -59,4 +54,3 @@ $templates = get_posts( array(
 			</p>
 		</form>
 	</div>
-</div>

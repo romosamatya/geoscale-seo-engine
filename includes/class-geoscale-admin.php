@@ -39,7 +39,25 @@ class GeoScale_Admin {
 	 * Render the settings page.
 	 */
 	public function display_plugin_setup_page() {
-		require_once WP_GEOSCALE_PLUGIN_DIR . 'views/admin-page-upload.php';
+		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'upload';
+		
+		echo '<div class="wrap">';
+		echo '<h1>' . esc_html( get_admin_page_title() ) . '</h1>';
+		
+		settings_errors( 'geoscale_messages' );
+		
+		echo '<h2 class="nav-tab-wrapper">';
+		echo '<a href="?page=wp-geoscale&tab=upload" class="nav-tab ' . ( $active_tab == 'upload' ? 'nav-tab-active' : '' ) . '">Upload CSV</a>';
+		echo '<a href="?page=wp-geoscale&tab=routes" class="nav-tab ' . ( $active_tab == 'routes' ? 'nav-tab-active' : '' ) . '">Generated Routes</a>';
+		echo '</h2>';
+
+		if ( 'upload' === $active_tab ) {
+			require_once WP_GEOSCALE_PLUGIN_DIR . 'views/admin-page-upload.php';
+		} elseif ( 'routes' === $active_tab ) {
+			require_once WP_GEOSCALE_PLUGIN_DIR . 'views/admin-page-routes.php';
+		}
+		
+		echo '</div>';
 	}
 
 	/**
