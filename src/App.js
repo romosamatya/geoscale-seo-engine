@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchStatus } from './store/uploadSlice';
 import CsvUploader from './components/CsvUploader';
 import ProgressMonitor from './components/ProgressMonitor';
-import SchemaEditor from './components/SchemaEditor';
+import SchemaEditor from './pro/SchemaEditor';
 import CampaignsList from './components/CampaignsList';
 import CampaignDetails from './components/CampaignDetails';
+import DevToolbar from './components/DevToolbar';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const App = () => {
     if (activeTaskId) {
         return (
             <div className="geoscale-app-container" style={{ padding: '20px', maxWidth: '1000px' }}>
+                <DevToolbar />
                 <h1>WP GeoScale Dashboard</h1>
                 <CampaignDetails />
             </div>
@@ -36,6 +38,7 @@ const App = () => {
 
     return (
         <div className="geoscale-app-container" style={{ padding: '20px', maxWidth: '1000px' }}>
+            <DevToolbar />
             <h1>WP GeoScale Dashboard</h1>
             
             <h2 className="nav-tab-wrapper" style={{ marginBottom: '20px' }}>

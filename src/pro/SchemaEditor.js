@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const { root, nonce } = window.geoscaleApiData || { root: '', nonce: '' };
 
 const SchemaEditor = () => {
+    const { isPremium } = useSelector(state => state.license);
     const [schema, setSchema] = useState('');
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState(null);
@@ -34,6 +36,16 @@ const SchemaEditor = () => {
         }
         setSaving(false);
     };
+
+    if (!isPremium) {
+        return (
+            <div style={{ background: '#fff', padding: '40px', border: '1px solid #ccd0d4', boxShadow: '0 1px 1px rgba(0,0,0,.04)', textAlign: 'center' }}>
+                <h2 style={{ fontSize: '24px' }}>JSON-LD Schema is a <span style={{ color: '#d63638' }}>PRO Feature</span></h2>
+                <p style={{ fontSize: '16px' }}>Upgrade to WP GeoScale Pro to unlock dynamic Schema.org generation and Spintax features.</p>
+                <button className="button button-primary button-large" disabled>Upgrade to Pro</button>
+            </div>
+        );
+    }
 
     return (
         <div style={{ background: '#fff', padding: '20px', border: '1px solid #ccd0d4', boxShadow: '0 1px 1px rgba(0,0,0,.04)' }}>

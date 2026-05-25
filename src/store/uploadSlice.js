@@ -4,12 +4,14 @@ const { root, nonce } = window.geoscaleApiData || { root: '', nonce: '' };
 
 export const uploadCsv = createAsyncThunk(
     'upload/uploadCsv',
-    async (formData, { rejectWithValue }) => {
+    async (formData, { getState, rejectWithValue }) => {
         try {
+            const { isPremium } = getState().license;
             const response = await fetch(`${root}geoscale/v1/upload`, {
                 method: 'POST',
                 headers: {
-                    'X-WP-Nonce': nonce
+                    'X-WP-Nonce': nonce,
+                    'X-GeoScale-Tier': isPremium ? 'Pro' : 'Free'
                 },
                 body: formData
             });

@@ -42,23 +42,11 @@ class GeoScale_Shortcodes {
 
 			if ( isset( $payload[ $atts['field'] ] ) ) {
 				$text = wp_kses_post( $payload[ $atts['field'] ] );
-				return $this->parse_spintax( $text );
+				return class_exists( 'GeoScale_Spintax' ) ? GeoScale_Spintax::parse( $text ) : $text;
 			}
 		}
 
-		return $this->parse_spintax( wp_kses_post( $atts['default'] ) );
-	}
-
-	/**
-	 * Parse Spintax formatted text like {Fast|Reliable|Expert} Plumbers.
-	 */
-	private function parse_spintax( $text ) {
-		return preg_replace_callback( '/\{(((?>[^\{\}]+)|(?R))*)\}/x', array( $this, 'spintax_replace' ), $text );
-	}
-
-	private function spintax_replace( $matches ) {
-		$text = $this->parse_spintax( $matches[1] );
-		$parts = explode( '|', $text );
-		return $parts[ array_rand( $parts ) ];
+		$fallback = wp_kses_post( $atts['default'] );
+		return class_exists( 'GeoScale_Spintax' ) ? GeoScale_Spintax::parse( $fallback ) : $fallback;
 	}
 }

@@ -35,6 +35,15 @@ if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/
 }
 
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
+require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
+require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
+require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
+require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
+
+// Conditional Pro Loader
+if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
+	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php';
+}
 
 /**
  * Plugin activation hook.
@@ -61,30 +70,23 @@ register_deactivation_hook( __FILE__, 'deactivate_wp_geoscale' );
  * Initialize the plugin.
  */
 function run_wp_geoscale() {
+	$plugin_router = new GeoScale_Router();
+	$plugin_router->init();
+
+	$plugin_shortcodes = new GeoScale_Shortcodes();
+	$plugin_shortcodes->init();
+
 	if ( is_admin() ) {
-		require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
 		$plugin_admin = new GeoScale_Admin();
 		$plugin_admin->init();
 	}
 
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
 	$plugin_api = new GeoScale_API();
 	$plugin_api->init();
 
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-batch.php';
-	$plugin_batch = new GeoScale_Batch();
-	$plugin_batch->init();
-
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
-	$plugin_router = new GeoScale_Router();
-	$plugin_router->init();
-
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
-	$plugin_shortcodes = new GeoScale_Shortcodes();
-	$plugin_shortcodes->init();
-
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-seo.php';
-	$plugin_seo = new GeoScale_SEO();
-	$plugin_seo->init();
+	if ( class_exists( 'GeoScale_Pro' ) ) {
+		$geoscale_pro = new GeoScale_Pro();
+		$geoscale_pro->init();
+	}
 }
 add_action( 'plugins_loaded', 'run_wp_geoscale' );

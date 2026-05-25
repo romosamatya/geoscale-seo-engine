@@ -113,6 +113,13 @@ class GeoScale_API {
 			fclose( $handle );
 		}
 
+		// Free Tier Limit Simulation
+		$tier = $request->get_header( 'x_geoscale_tier' );
+		if ( 'Free' === $tier && $total_rows > 100 ) {
+			@unlink( $file_path );
+			return new WP_Error( 'free_tier_limit', "Free version is strictly limited to 100 rows. Your CSV has $total_rows rows. Please upgrade to WP GeoScale Pro.", array( 'status' => 403 ) );
+		}
+
 		if ( $total_rows > 0 ) {
 			global $wpdb;
 			$tasks_table = GeoScale_DB::get_tasks_table_name();
@@ -173,6 +180,17 @@ class GeoScale_API {
 
 	public function save_schema( WP_REST_Request $request ) {
 		$schema = $request->get_param( 'schema' );
+		update_option( 'geoscale_schema_template', $schema );
+		return rest_ensure_response( array( 'success' => true, 'message' => 'Schema saved successfully.' ) );
+	}
+
+	public function handle_bulk_action( WP_REST_Request $request ) {
+		$tier = $request->get_header( 'x_geoscale_tier' );
+		if ( 'Free' === $tier ) {
+			return new WP_Error( 'free_tier_limit', 'Campaign Bulk Actions are a PRO feature. Upgrade to unlock this capability.', array( 'status' => 403 ) );
+		}
+
+		$task_id = absint( $request->get_param( 'task_id' ) );
 		update_option( 'geoscale_schema_template', $schema );
 		return rest_ensure_response( array( 'success' => true, 'message' => 'Schema saved successfully.' ) );
 	}
