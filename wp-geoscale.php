@@ -29,6 +29,11 @@ if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once WP_GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
+// Action Scheduler requires explicit initialization when bundled via Composer
+if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php' ) ) {
+	require_once WP_GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
+}
+
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
 
 /**
