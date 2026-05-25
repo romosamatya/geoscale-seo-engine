@@ -77,6 +77,12 @@ class GeoScale_API {
 
 		$file = $files['csv_file'];
 
+		// Strict Security Patch: Validate File Extension
+		$file_ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
+		if ( 'csv' !== $file_ext ) {
+			return new WP_Error( 'security_violation', 'Invalid file type. Only strict .csv files are permitted.', array( 'status' => 403 ) );
+		}
+
 		// Secure upload directory
 		$upload_dir = wp_upload_dir();
 		$geoscale_dir = $upload_dir['basedir'] . '/geoscale_temp';
