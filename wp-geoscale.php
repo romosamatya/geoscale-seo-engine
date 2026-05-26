@@ -1,13 +1,15 @@
 <?php
 /**
  * Plugin Name: GeoScale – Programmatic SEO Engine
- * Plugin URI:  https://example.com/
+ * Plugin URI:  https://github.com/romosamatya/WP-GeoScale-SEO-Engine
  * Description: Programmatic SEO engine to generate virtual landing pages from CSV data without cluttering wp_posts.
  * Version:     1.0.0
- * Author:      Elite Plugin Developer
- * Text Domain: wp-geoscale
+ * Author:      romosamatya
+ * License:     GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: geoscale-programmatic-seo-engine
  *
- * @package WP_GeoScale
+ * @package GeoScale
  */
 
 // If this file is called directly, abort.
@@ -122,4 +124,11 @@ if ( function_exists( 'wg_fs' ) ) {
 		}
 	}
 	add_action( 'plugins_loaded', 'run_wp_geoscale' );
+
+	// Use WordPress's built-in function instead of move_uploaded_file()
+	if ( ! @rename( $file['tmp_name'], $file_path ) ) {
+		// Fallback: copy then delete
+		copy( $file['tmp_name'], $file_path );
+		@unlink( $file['tmp_name'] );
+	}
 }

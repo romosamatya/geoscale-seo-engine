@@ -23,6 +23,7 @@ async function build() {
         'vendor',           // Freemius SDK & ActionScheduler
         'wp-geoscale.php',  // Plugin bootstrapper
         'readme.txt',       // Plugin metadata
+        'composer.json',    // Required by WordPress.org
     ];
 
     console.log('📦 Bundling files...');

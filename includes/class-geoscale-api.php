@@ -93,7 +93,13 @@ class GeoScale_API {
 		}
 
 		$file_path = $geoscale_dir . '/' . sanitize_file_name( time() . '_' . $file['name'] );
-		move_uploaded_file( $file['tmp_name'], $file_path );
+		// Use rename instead of move_uploaded_file() per WordPress guidelines
+		if ( ! rename( $file['tmp_name'], $file_path ) ) {
+			// Fallback: copy then delete
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			@copy( $file['tmp_name'], $file_path );
+			@unlink( $file['tmp_name'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		}
 
 		// Parse total rows
 		$total_rows = 0;

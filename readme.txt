@@ -1,7 +1,7 @@
 === GeoScale – Programmatic SEO Engine ===
 Contributors: romosamatya
 Requires at least: 5.8
-Tested up to: 6.4
+Tested up to: 6.7
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
