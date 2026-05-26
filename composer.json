@@ -1,0 +1,6 @@
+{
+    "require": {
+        "woocommerce/action-scheduler": "^3.9",
+        "freemius/wordpress-sdk": "^2.13"
+    }
+}
