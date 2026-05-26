@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const archiver = require('archiver');
+const AdmZip = require('adm-zip');
 const path = require('path');
 
 const pluginName = 'wp-geoscale';
@@ -14,19 +14,7 @@ async function build() {
     }
     fs.mkdirpSync(outDir);
 
-    const output = fs.createWriteStream(zipPath);
-    const archive = archiver('zip', { zlib: { level: 9 } });
-
-    output.on('close', () => {
-        console.log(`✅ Build complete! ${archive.pointer()} total bytes`);
-        console.log(`📁 Your premium zip is ready at: ${zipPath}`);
-    });
-
-    archive.on('error', (err) => {
-        throw err;
-    });
-
-    archive.pipe(output);
+    const zip = new AdmZip();
 
     // Whitelist approach: Only bundle what is needed for production
     const allowed = [
@@ -42,17 +30,19 @@ async function build() {
         if (fs.existsSync(itemPath)) {
             const stat = fs.statSync(itemPath);
             if (stat.isDirectory()) {
-                // The second parameter puts it inside a root folder named wp-geoscale in the zip
-                archive.directory(itemPath + '/', `${pluginName}/${item}`);
+                zip.addLocalFolder(itemPath, `${pluginName}/${item}`);
             } else {
-                archive.file(itemPath, { name: `${pluginName}/${item}` });
+                zip.addLocalFile(itemPath, pluginName);
             }
         } else {
             console.warn(`⚠️ Warning: ${item} not found!`);
         }
     }
 
-    await archive.finalize();
+    console.log('💾 Writing zip file...');
+    zip.writeZip(zipPath);
+    console.log(`✅ Build complete!`);
+    console.log(`📁 Your premium zip is ready at: ${zipPath}`);
 }
 
 build();

@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@wordpress/scripts": "^26.0.0",
-    "archiver": "^8.0.0",
+    "adm-zip": "^0.5.17",
     "fs-extra": "^11.3.5"
   },
   "dependencies": {
