@@ -1,4 +1,4 @@
-=== WP GeoScale ===
+=== GeoScale – Programmatic SEO Engine ===
 Contributors: romosamatya
 Requires at least: 5.8
 Tested up to: 6.4
