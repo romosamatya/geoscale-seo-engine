@@ -34,14 +34,48 @@ if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/
 	require_once WP_GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 }
 
+// Create a helper function for easy SDK access.
+function wp_geoscale_fs() {
+	global $wp_geoscale_fs;
+
+	if ( ! isset( $wp_geoscale_fs ) ) {
+		if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'freemius/start.php' ) ) {
+			// Include Freemius SDK.
+			require_once WP_GEOSCALE_PLUGIN_DIR . 'freemius/start.php';
+
+			$wp_geoscale_fs = fs_dynamic_init( array(
+				'id'                  => 'YOUR_FREEMIUS_ID',
+				'slug'                => 'wp-geoscale',
+				'type'                => 'plugin',
+				'public_key'          => 'YOUR_FREEMIUS_PUBLIC_KEY',
+				'is_premium'          => true,
+				'has_addons'          => false,
+				'has_paid_plans'      => true,
+				'menu'                => array(
+					'slug'           => 'wp-geoscale',
+					'first-path'     => 'admin.php?page=wp-geoscale',
+				),
+			) );
+		} else {
+			// Dummy fallback for when the freemius folder hasn't been uploaded yet
+			$wp_geoscale_fs = new stdClass();
+			$wp_geoscale_fs->can_use_premium_code = function() { return false; };
+		}
+	}
+
+	return $wp_geoscale_fs;
+}
+wp_geoscale_fs(); // Init Freemius
+do_action( 'wp_geoscale_fs_loaded' ); // Signal that SDK was initiated
+
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
 
-// Conditional Pro Loader
-if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
+// Conditional Pro Loader tied to Freemius License
+if ( wp_geoscale_fs()->can_use_premium_code() && file_exists( WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
 	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php';
 }
 
@@ -84,7 +118,7 @@ function run_wp_geoscale() {
 	$plugin_api = new GeoScale_API();
 	$plugin_api->init();
 
-	if ( class_exists( 'GeoScale_Pro' ) ) {
+	if ( wp_geoscale_fs()->can_use_premium_code() && class_exists( 'GeoScale_Pro' ) ) {
 		$geoscale_pro = new GeoScale_Pro();
 		$geoscale_pro->init();
 	}

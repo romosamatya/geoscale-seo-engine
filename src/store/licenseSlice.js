@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const { is_premium } = window.geoscaleApiData || { is_premium: false };
+
 const initialState = {
-    isPremium: true,
+    isPremium: is_premium,
     limits: {
         maxRows: 100,
         maxCampaigns: 1
@@ -11,12 +13,7 @@ const initialState = {
 const licenseSlice = createSlice({
     name: 'license',
     initialState,
-    reducers: {
-        togglePremium: (state) => {
-            state.isPremium = !state.isPremium;
-        }
-    }
+    reducers: {}
 });
 
-export const { togglePremium } = licenseSlice.actions;
 export default licenseSlice.reducer;
