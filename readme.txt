@@ -11,27 +11,34 @@ Generate thousands of geo-targeted landing pages from a CSV upload — without c
 
 == Description ==
 
-WP GeoScale is an advanced programmatic SEO engine designed for WordPress. Instead of creating thousands of physical posts (which slows down your database), WP GeoScale uses virtual routing to intercept URLs and render dynamic content on the fly. 
+GeoScale is an advanced programmatic SEO engine designed for WordPress. Instead of creating thousands of physical posts (which slows down your database), GeoScale uses virtual routing to intercept URLs and render dynamic content on the fly.
 
-Simply upload a CSV with your location data, configure a master template, and WP GeoScale will instantly generate thousands of perfectly optimized landing pages complete with dynamic JSON-LD Schema.
+Simply upload a CSV with your location data, configure a master template, and GeoScale will instantly generate thousands of perfectly optimized landing pages complete with dynamic JSON-LD Schema.
 
 ### Premium Features
 * **Spintax Engine**: Generate unique content variations automatically.
 * **Dynamic Schema Generation**: Output perfectly structured JSON-LD for LocalBusiness and Services.
 * **Bulk Actions**: Batch process and map variables at an enterprise scale.
 
+== Source Code ==
+
+The full source code for this plugin, including all build tools and scripts, is publicly available at:
+https://github.com/romosamatya/WP-GeoScale-SEO-Engine
+
+The React-based admin UI is built using @wordpress/scripts. To regenerate the compiled assets, run `npm install` then `npm run build` from the plugin root.
+
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/wp-geoscale` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/geoscale-programmatic-seo-engine` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Click on the "WP GeoScale" menu to configure your first programmatic campaign.
+3. Click on the "GeoScale" menu item in the WordPress admin sidebar.
 
 == Frequently Asked Questions ==
 
 = Does this create physical pages in WordPress? =
-No. WP GeoScale intercepts URLs dynamically, rendering the page on the fly without writing thousands of posts to the `wp_posts` table.
+No. GeoScale intercepts URLs dynamically, rendering the page on the fly without writing thousands of posts to the `wp_posts` table.
 
 == Changelog ==
 
 = 1.0.0 =
-* Initial release of WP GeoScale engine.
+* Initial release of GeoScale engine.

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: GeoScale – Programmatic SEO Engine
- * Plugin URI:  https://github.com/romosamatya/WP-GeoScale-SEO-Engine
+ * Plugin URI:  https://geoscale-seo.netlify.app
  * Description: Programmatic SEO engine to generate virtual landing pages from CSV data without cluttering wp_posts.
  * Version:     1.0.0
  * Author:      romosamatya
@@ -20,15 +20,15 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Define constants.
  */
-define( 'WP_GEOSCALE_VERSION', '1.0.0' );
-define( 'WP_GEOSCALE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WP_GEOSCALE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'GEOSCALE_VERSION', '1.0.0' );
+define( 'GEOSCALE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'GEOSCALE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
 /**
  * Load core dependencies via Composer Autoloader.
  */
-if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php';
+if ( file_exists( GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	require_once GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
 if ( function_exists( 'wg_fs' ) ) {
@@ -68,42 +68,42 @@ if ( function_exists( 'wg_fs' ) ) {
 		do_action( 'wg_fs_loaded' ); // Signal that SDK was initiated
 	}
 
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
-	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
 
 	// Conditional Pro Loader tied to Freemius License
-	if ( wg_fs()->can_use_premium_code() && file_exists( WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
-		require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php';
+	if ( wg_fs()->can_use_premium_code() && file_exists( GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
+		require_once GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php';
 	}
 
 	/**
 	 * Plugin activation hook.
 	 */
-	function activate_wp_geoscale() {
+	function geoscale_activate() {
 		GeoScale_DB::create_table();
 		
-		require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
+		require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
 		$router = new GeoScale_Router();
 		$router->add_rewrite_rules();
 		flush_rewrite_rules();
 	}
-	register_activation_hook( __FILE__, 'activate_wp_geoscale' );
+	register_activation_hook( __FILE__, 'geoscale_activate' );
 
 	/**
 	 * Plugin deactivation hook.
 	 */
-	function deactivate_wp_geoscale() {
+	function geoscale_deactivate() {
 		// Do not drop the table on deactivation to preserve user data.
 	}
-	register_deactivation_hook( __FILE__, 'deactivate_wp_geoscale' );
+	register_deactivation_hook( __FILE__, 'geoscale_deactivate' );
 
 	/**
 	 * Initialize the plugin.
 	 */
-	function run_wp_geoscale() {
+	function geoscale_run() {
 		$plugin_router = new GeoScale_Router();
 		$plugin_router->init();
 
@@ -123,5 +123,5 @@ if ( function_exists( 'wg_fs' ) ) {
 			$geoscale_pro->init();
 		}
 	}
-	add_action( 'plugins_loaded', 'run_wp_geoscale' );
+	add_action( 'plugins_loaded', 'geoscale_run' );
 }

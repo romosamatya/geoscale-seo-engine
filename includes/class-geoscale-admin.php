@@ -2,7 +2,7 @@
 /**
  * Admin functionality for the plugin.
  *
- * @package WP_GeoScale
+ * @package GeoScale
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -18,10 +18,10 @@ class GeoScale_Admin {
 
 	public function add_plugin_admin_menu() {
 		add_menu_page(
-			'WP GeoScale',
+			'GeoScale – Programmatic SEO Engine',
 			'GeoScale',
 			'manage_options',
-			'wp-geoscale',
+			'geoscale-engine',
 			array( $this, 'display_react_container' ),
 			'dashicons-admin-site-alt3',
 			80
@@ -29,11 +29,11 @@ class GeoScale_Admin {
 	}
 
 	public function enqueue_react_app( $hook_suffix ) {
-		if ( $hook_suffix !== 'toplevel_page_wp-geoscale' ) {
+		if ( $hook_suffix !== 'toplevel_page_geoscale-engine' ) {
 			return;
 		}
 
-		$asset_file_path = WP_GEOSCALE_PLUGIN_DIR . 'build/index.asset.php';
+		$asset_file_path = GEOSCALE_PLUGIN_DIR . 'build/index.asset.php';
 		if ( ! file_exists( $asset_file_path ) ) {
 			return; // React build not found
 		}
@@ -42,7 +42,7 @@ class GeoScale_Admin {
 
 		wp_enqueue_script(
 			'geoscale-react-app',
-			WP_GEOSCALE_PLUGIN_URL . 'build/index.js',
+			GEOSCALE_PLUGIN_URL . 'build/index.js',
 			$asset_file['dependencies'],
 			$asset_file['version'],
 			true
