@@ -58,8 +58,14 @@ function wp_geoscale_fs() {
 			) );
 		} else {
 			// Dummy fallback for when the freemius folder hasn't been uploaded yet
-			$wp_geoscale_fs = new stdClass();
-			$wp_geoscale_fs->can_use_premium_code = function() { return false; };
+			if ( ! class_exists( 'GeoScale_FS_Dummy' ) ) {
+				class GeoScale_FS_Dummy {
+					public function can_use_premium_code() {
+						return false;
+					}
+				}
+			}
+			$wp_geoscale_fs = new GeoScale_FS_Dummy();
 		}
 	}
 
