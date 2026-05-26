@@ -124,11 +124,4 @@ if ( function_exists( 'wg_fs' ) ) {
 		}
 	}
 	add_action( 'plugins_loaded', 'run_wp_geoscale' );
-
-	// Use WordPress's built-in function instead of move_uploaded_file()
-	if ( ! @rename( $file['tmp_name'], $file_path ) ) {
-		// Fallback: copy then delete
-		copy( $file['tmp_name'], $file_path );
-		@unlink( $file['tmp_name'] );
-	}
 }
