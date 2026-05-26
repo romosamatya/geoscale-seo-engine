@@ -51,7 +51,7 @@ class GeoScale_Admin {
 		wp_localize_script( 'geoscale-react-app', 'geoscaleApiData', array(
 			'root'       => esc_url_raw( rest_url() ),
 			'nonce'      => wp_create_nonce( 'wp_rest' ),
-			'is_premium' => wp_geoscale_fs()->can_use_premium_code(),
+			'is_premium' => wg_fs()->can_use_premium_code(),
 		) );
 	}
 

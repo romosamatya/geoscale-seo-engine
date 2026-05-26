@@ -35,25 +35,27 @@ if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/
 }
 
 // Create a helper function for easy SDK access.
-function wp_geoscale_fs() {
-	global $wp_geoscale_fs;
+function wg_fs() {
+	global $wg_fs;
 
-	if ( ! isset( $wp_geoscale_fs ) ) {
-		if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'freemius/start.php' ) ) {
+	if ( ! isset( $wg_fs ) ) {
+		if ( file_exists( WP_GEOSCALE_PLUGIN_DIR . 'vendor/freemius/start.php' ) ) {
 			// Include Freemius SDK.
-			require_once WP_GEOSCALE_PLUGIN_DIR . 'freemius/start.php';
+			require_once WP_GEOSCALE_PLUGIN_DIR . 'vendor/freemius/start.php';
 
-			$wp_geoscale_fs = fs_dynamic_init( array(
-				'id'                  => 'YOUR_FREEMIUS_ID',
+			$wg_fs = fs_dynamic_init( array(
+				'id'                  => '30540',
 				'slug'                => 'wp-geoscale',
 				'type'                => 'plugin',
-				'public_key'          => 'YOUR_FREEMIUS_PUBLIC_KEY',
+				'public_key'          => 'pk_96c205fef23171eb3cfd72b82e77d',
 				'is_premium'          => true,
 				'has_addons'          => false,
 				'has_paid_plans'      => true,
+				'is_org_compliant'    => true,
 				'menu'                => array(
 					'slug'           => 'wp-geoscale',
 					'first-path'     => 'admin.php?page=wp-geoscale',
+					'support'        => false,
 				),
 			) );
 		} else {
@@ -65,14 +67,14 @@ function wp_geoscale_fs() {
 					}
 				}
 			}
-			$wp_geoscale_fs = new GeoScale_FS_Dummy();
+			$wg_fs = new GeoScale_FS_Dummy();
 		}
 	}
 
-	return $wp_geoscale_fs;
+	return $wg_fs;
 }
-wp_geoscale_fs(); // Init Freemius
-do_action( 'wp_geoscale_fs_loaded' ); // Signal that SDK was initiated
+wg_fs(); // Init Freemius
+do_action( 'wg_fs_loaded' ); // Signal that SDK was initiated
 
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
@@ -81,7 +83,7 @@ require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
 require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
 
 // Conditional Pro Loader tied to Freemius License
-if ( wp_geoscale_fs()->can_use_premium_code() && file_exists( WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
+if ( wg_fs()->can_use_premium_code() && file_exists( WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
 	require_once WP_GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php';
 }
 
@@ -124,7 +126,7 @@ function run_wp_geoscale() {
 	$plugin_api = new GeoScale_API();
 	$plugin_api->init();
 
-	if ( wp_geoscale_fs()->can_use_premium_code() && class_exists( 'GeoScale_Pro' ) ) {
+	if ( wg_fs()->can_use_premium_code() && class_exists( 'GeoScale_Pro' ) ) {
 		$geoscale_pro = new GeoScale_Pro();
 		$geoscale_pro->init();
 	}
