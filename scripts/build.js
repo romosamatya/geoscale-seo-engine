@@ -22,6 +22,7 @@ async function build() {
         'includes',         // PHP core and Pro logic
         'vendor',           // Freemius SDK & ActionScheduler
         'wp-geoscale.php',  // Plugin bootstrapper
+        'readme.txt',       // Plugin metadata
     ];
 
     console.log('📦 Bundling files...');
