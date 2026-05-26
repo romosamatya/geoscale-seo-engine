@@ -6,7 +6,8 @@ const { execSync } = require('child_process');
 const pluginName = 'wp-geoscale';
 const rootDir = path.resolve(__dirname, '..');
 const outDir = path.join(rootDir, 'dist');
-const zipPath = path.join(outDir, `${pluginName}.zip`);
+const premiumZipPath = path.join(outDir, `${pluginName}-premium.zip`);
+const freeZipPath = path.join(outDir, `${pluginName}-free.zip`);
 const freeRepoDir = path.join(outDir, 'geoscale-free-repo');
 const FREE_REPO_URL = 'https://github.com/romosamatya/geoscale-seo-engine.git';
 
@@ -44,9 +45,9 @@ async function build() {
         }
     }
 
-    console.log('💾 Writing zip file...');
-    zip.writeZip(zipPath);
-    console.log(`✅ Premium zip ready: ${zipPath}`);
+    console.log('💾 Writing premium zip file...');
+    zip.writeZip(premiumZipPath);
+    console.log(`✅ Premium zip ready: ${premiumZipPath}`);
 
     // ---------------------------------------------------------
     // Push free-only version to the public GitHub repo
@@ -111,6 +112,31 @@ async function build() {
     } catch (e) {
         console.log('ℹ️  Nothing new to push to public repo.');
     }
+
+    // ---------------------------------------------------------
+    // Create the Free ZIP for WordPress.org
+    // ---------------------------------------------------------
+    console.log('\n📦 Bundling free zip for WordPress.org...');
+    const freeZip = new AdmZip();
+    
+    // We already copied the free files to freeRepoDir, so let's zip that folder
+    const freeFiles = fs.readdirSync(freeRepoDir).filter(f => f !== '.git');
+    for (const f of freeFiles) {
+        const itemPath = path.join(freeRepoDir, f);
+        const stat = fs.statSync(itemPath);
+        if (stat.isDirectory()) {
+            freeZip.addLocalFolder(itemPath, `${pluginName}/${f}`);
+        } else {
+            freeZip.addLocalFile(itemPath, pluginName);
+        }
+    }
+    
+    console.log('💾 Writing free zip file...');
+    freeZip.writeZip(freeZipPath);
+    console.log(`✅ Free zip ready: ${freeZipPath}`);
+    console.log('\n🚀 ALL DONE!');
+    console.log(`1. Upload ${pluginName}-premium.zip to Freemius`);
+    console.log(`2. Upload ${pluginName}-free.zip to WordPress.org`);
 }
 
 build();
