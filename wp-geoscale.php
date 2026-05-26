@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: GeoScale – Programmatic SEO Engine
- * Plugin URI:  https://geoscale-seo.netlify.app
+ * Plugin URI:  https://github.com/romosamatya/geoscale-seo-engine
  * Description: Programmatic SEO engine to generate virtual landing pages from CSV data without cluttering wp_posts.
  * Version:     1.0.0
  * Author:      romosamatya

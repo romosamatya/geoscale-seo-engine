@@ -23,7 +23,7 @@ Simply upload a CSV with your location data, configure a master template, and Ge
 == Source Code ==
 
 The full source code for this plugin, including all build tools and scripts, is publicly available at:
-https://github.com/romosamatya/WP-GeoScale-SEO-Engine
+https://github.com/romosamatya/geoscale-seo-engine
 
 The React-based admin UI is built using @wordpress/scripts. To regenerate the compiled assets, run `npm install` then `npm run build` from the plugin root.
 
