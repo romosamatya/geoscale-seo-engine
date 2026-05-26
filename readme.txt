@@ -7,7 +7,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-WP GeoScale is an enterprise programmatic SEO engine that generates highly-optimized, dynamic location landing pages at scale without cluttering your WordPress database.
+Generate thousands of geo-targeted landing pages from a CSV upload — without creating physical posts in your WordPress database.
 
 == Description ==
 

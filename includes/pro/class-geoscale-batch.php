@@ -47,12 +47,14 @@ class GeoScale_Batch {
 			return;
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
 			global $wpdb;
 			$table_name = GeoScale_DB::get_table_name();
 
 			$headers = fgetcsv( $handle, 10000, ',' );
 			if ( ! $headers ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				fclose( $handle );
 				return;
 			}
@@ -95,11 +97,13 @@ class GeoScale_Batch {
 			}
 
 			$is_eof = feof( $handle );
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 			fclose( $handle );
 
-			// Cleanup file on last chunk and mark task completed
+			// Cleanup file on last chunk
 			if ( $is_eof || $processed < $limit ) {
-				@unlink( $file_path );
+				wp_delete_file( $file_path );
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$tasks_table = GeoScale_DB::get_tasks_table_name();
 				$wpdb->update( $tasks_table, array( 'status' => 'completed' ), array( 'id' => $task_id ) );
 			}

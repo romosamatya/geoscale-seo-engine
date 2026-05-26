@@ -93,37 +93,40 @@ class GeoScale_API {
 		}
 
 		$file_path = $geoscale_dir . '/' . sanitize_file_name( time() . '_' . $file['name'] );
-		// Use rename instead of move_uploaded_file() per WordPress guidelines
-		if ( ! rename( $file['tmp_name'], $file_path ) ) {
-			// Fallback: copy then delete
-			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-			@copy( $file['tmp_name'], $file_path );
-			@unlink( $file['tmp_name'] ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		// Use WordPress filesystem API to move the uploaded temp file
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+		if ( ! $wp_filesystem->move( $file['tmp_name'], $file_path, true ) ) {
+			return new WP_Error( 'upload_failed', 'Failed to move uploaded file.', array( 'status' => 500 ) );
 		}
 
 		// Parse total rows
 		$total_rows = 0;
-		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		if ( ( $handle = fopen( $file_path, 'r' ) ) !== false ) { // phpcs:ignore
 			$headers = fgetcsv( $handle, 10000, ',' ); // Header row
 			if ( $headers ) {
 				$slug_index = array_search( 'route_slug', array_map( 'trim', $headers ) );
 				if ( $slug_index === false ) {
-					fclose( $handle );
-					unlink( $file_path );
+					fclose( $handle ); // phpcs:ignore
+					wp_delete_file( $file_path );
 					return new WP_Error( 'invalid_csv', 'CSV must contain route_slug column.', array( 'status' => 400 ) );
 				}
 				while ( fgetcsv( $handle, 10000, ',' ) !== false ) {
 					$total_rows++;
 				}
 			}
-			fclose( $handle );
+			fclose( $handle ); // phpcs:ignore
 		}
 
-		// Free Tier Limit Simulation
+		// Free Tier Limit
 		$tier = $request->get_header( 'x_geoscale_tier' );
 		if ( 'Free' === $tier && $total_rows > 100 ) {
-			@unlink( $file_path );
-			return new WP_Error( 'free_tier_limit', "Free version is strictly limited to 100 rows. Your CSV has $total_rows rows. Please upgrade to WP GeoScale Pro.", array( 'status' => 403 ) );
+			wp_delete_file( $file_path );
+			return new WP_Error( 'free_tier_limit', "Free version is limited to 100 rows. Your CSV has {$total_rows} rows. Upgrade to GeoScale Pro.", array( 'status' => 403 ) );
 		}
 
 		if ( $total_rows > 0 ) {
@@ -131,7 +134,8 @@ class GeoScale_API {
 			$tasks_table = GeoScale_DB::get_tasks_table_name();
 
 			// Auto-create tables if they are missing to prevent DB errors breaking the JSON response
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '$tasks_table'" ) != $tasks_table ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tasks_table ) ) !== $tasks_table ) {
 				GeoScale_DB::create_table();
 			}
 
@@ -164,12 +168,16 @@ class GeoScale_API {
 		global $wpdb;
 		$table = $wpdb->prefix . 'actionscheduler_actions';
 		
-		if ( $wpdb->get_var("SHOW TABLES LIKE '$table'") != $table ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
 			return rest_ensure_response( array( 'pending' => 0, 'in_progress' => 0, 'active_jobs' => 0 ) );
 		}
 		
-		$pending = $wpdb->get_var( "SELECT COUNT(action_id) FROM {$table} WHERE hook = 'geoscale_process_csv_chunk' AND status = 'pending'" );
-		$in_progress = $wpdb->get_var( "SELECT COUNT(action_id) FROM {$table} WHERE hook = 'geoscale_process_csv_chunk' AND status = 'in-progress'" );
+		$safe_table = esc_sql( $table );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$pending = $wpdb->get_var( "SELECT COUNT(action_id) FROM `{$safe_table}` WHERE hook = 'geoscale_process_csv_chunk' AND status = 'pending'" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$in_progress = $wpdb->get_var( "SELECT COUNT(action_id) FROM `{$safe_table}` WHERE hook = 'geoscale_process_csv_chunk' AND status = 'in-progress'" );
 
 		return rest_ensure_response( array(
 			'pending'     => (int) $pending,
@@ -196,11 +204,14 @@ class GeoScale_API {
 		global $wpdb;
 		$tasks_table = GeoScale_DB::get_tasks_table_name();
 
-		if ( $wpdb->get_var("SHOW TABLES LIKE '$tasks_table'") != $tasks_table ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tasks_table ) ) !== $tasks_table ) {
 			return rest_ensure_response( array() );
 		}
 
-		$tasks = $wpdb->get_results( "SELECT * FROM {$tasks_table} ORDER BY created_at DESC" );
+		$safe_tasks = esc_sql( $tasks_table );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$tasks = $wpdb->get_results( "SELECT * FROM `{$safe_tasks}` ORDER BY created_at DESC" );
 		return rest_ensure_response( $tasks );
 	}
 
@@ -220,8 +231,11 @@ class GeoScale_API {
 			$where .= $wpdb->prepare( " AND route_slug LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
 		}
 
-		$total = $wpdb->get_var( "SELECT COUNT(id) FROM {$table_name} {$where}" );
-		$routes = $wpdb->get_results( "SELECT id, route_slug, is_active, dynamic_data FROM {$table_name} {$where} ORDER BY id ASC LIMIT {$per_page} OFFSET {$offset}" );
+		$safe_tbl  = esc_sql( $table_name );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$total  = $wpdb->get_var( "SELECT COUNT(id) FROM `{$safe_tbl}` {$where}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$routes = $wpdb->get_results( "SELECT id, route_slug, is_active, dynamic_data FROM `{$safe_tbl}` {$where} ORDER BY id ASC LIMIT {$per_page} OFFSET {$offset}" );
 
 		// Decode dynamic_data for the frontend preview
 		foreach ( $routes as &$route ) {

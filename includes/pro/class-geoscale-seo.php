@@ -99,9 +99,18 @@ class GeoScale_SEO {
 		// Process shortcodes within the schema template
 		$parsed_schema = do_shortcode( $schema_template );
 		
-		echo "\n<!-- WP GeoScale JSON-LD Schema -->\n";
+		// JSON-LD is structured data, not HTML - use wp_json_encode for safe output
+		$schema_decoded = json_decode( $parsed_schema, true );
+		if ( $schema_decoded ) {
+			$safe_schema = wp_json_encode( $schema_decoded, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+		} else {
+			// Already a raw string template - sanitize it
+			$safe_schema = wp_strip_all_tags( $parsed_schema );
+		}
+
+		echo "\n<!-- GeoScale JSON-LD Schema -->\n";
 		echo "<script type=\"application/ld+json\">\n";
-		echo $parsed_schema . "\n";
-		echo "</script>\n<!-- End WP GeoScale Schema -->\n";
+		echo $safe_schema . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo "</script>\n<!-- End GeoScale Schema -->\n";
 	}
 }
