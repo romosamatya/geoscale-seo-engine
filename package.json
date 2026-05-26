@@ -5,10 +5,13 @@
   "main": "build/index.js",
   "scripts": {
     "build": "wp-scripts build",
+    "build:zip": "node scripts/build.js",
     "start": "wp-scripts start"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^26.0.0"
+    "@wordpress/scripts": "^26.0.0",
+    "archiver": "^8.0.0",
+    "fs-extra": "^11.3.5"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
