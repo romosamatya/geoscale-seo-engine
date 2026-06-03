@@ -10,6 +10,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
+
 // Fetch all pages to act as templates
 $templates = get_posts( array(
 	'post_type'      => 'page',

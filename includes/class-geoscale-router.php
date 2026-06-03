@@ -97,11 +97,8 @@ class GeoScale_Router {
 
 			// Highly optimized lookup against UNIQUE KEY index
 			$safe_table = esc_sql( $table_name );
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$sql = $wpdb->prepare(
-				"SELECT template_post_id, dynamic_data FROM `{$safe_table}` WHERE route_slug = %s AND is_active = 1 LIMIT 1",
-				$route_slug
-			);
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+			$sql = $wpdb->prepare( "SELECT template_post_id, dynamic_data FROM `{$safe_table}` WHERE route_slug = %s AND is_active = 1 LIMIT 1", $route_slug );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
 			$route_data = $wpdb->get_row( $sql );
 
@@ -186,11 +183,8 @@ class GeoScale_Router {
 		$table_name = GeoScale_DB::get_table_name();
 
 		$safe_table = esc_sql( $table_name );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$routes = $wpdb->get_col( $wpdb->prepare(
-			"SELECT route_slug FROM `{$safe_table}` WHERE template_post_id = %d",
-			$post_id
-		) );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$routes = $wpdb->get_col( $wpdb->prepare( "SELECT route_slug FROM `{$safe_table}` WHERE template_post_id = %d", $post_id ) );
 
 		if ( ! empty( $routes ) ) {
 			foreach ( $routes as $slug ) {

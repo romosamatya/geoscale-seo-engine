@@ -10,22 +10,24 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals
+
 global $wpdb;
 $table_name = GeoScale_DB::get_table_name();
+$safe_table = esc_sql( $table_name );
 
 // Pagination setup
 $per_page = 50;
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $paged = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 $offset = ( $paged - 1 ) * $per_page;
 
-$total_items = $wpdb->get_var( "SELECT COUNT(id) FROM {$table_name}" );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$total_items = $wpdb->get_var( "SELECT COUNT(id) FROM `{$safe_table}`" );
 $total_pages = ceil( $total_items / $per_page );
 
-$routes = $wpdb->get_results( $wpdb->prepare(
-	"SELECT * FROM {$table_name} ORDER BY id DESC LIMIT %d OFFSET %d",
-	$per_page,
-	$offset
-) );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+$routes = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM `{$safe_table}` ORDER BY id DESC LIMIT %d OFFSET %d", $per_page, $offset ) );
 
 ?>
 <div class="card" style="max-width: 100%; padding: 20px; margin-top: 20px;">
@@ -75,14 +77,15 @@ $routes = $wpdb->get_results( $wpdb->prepare(
 			<div class="tablenav-pages">
 				<span class="pagination-links">
 					<?php 
-					echo paginate_links( array(
+					echo wp_kses_post( paginate_links( array(
+						// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						'base' => add_query_arg( 'paged', '%#%' ),
 						'format' => '',
 						'prev_text' => '&laquo;',
 						'next_text' => '&raquo;',
 						'total' => $total_pages,
 						'current' => $paged,
-					) );
+					) ) );
 					?>
 				</span>
 			</div>

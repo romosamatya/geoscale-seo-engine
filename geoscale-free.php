@@ -7,7 +7,7 @@
  * Author:      romosamatya
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: geoscale-programmatic-seo-engine
+ * Text Domain: geoscale-free
  *
  * @package GeoScale
  */
@@ -31,18 +31,18 @@ if ( file_exists( GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
-if ( function_exists( 'wg_fs' ) ) {
-	wg_fs()->set_basename( true, __FILE__ );
+if ( function_exists( 'geoscale_fs' ) ) {
+	geoscale_fs()->set_basename( true, __FILE__ );
 } else {
 	// DO NOT REMOVE THIS IF. Essential for Freemius auto-deactivate mechanics.
-	if ( ! function_exists( 'wg_fs' ) ) {
+	if ( ! function_exists( 'geoscale_fs' ) ) {
 		// Create a helper function for easy SDK access.
-		function wg_fs() {
-			global $wg_fs;
+		function geoscale_fs() {
+			global $geoscale_fs;
 
-			if ( ! isset( $wg_fs ) ) {
+			if ( ! isset( $geoscale_fs ) ) {
 				// SDK is auto-loaded through Composer
-				$wg_fs = fs_dynamic_init( array(
+				$geoscale_fs = fs_dynamic_init( array(
 					'id'                  => '30540',
 					'slug'                => 'wp-geoscale',
 					'type'                => 'plugin',
@@ -61,11 +61,11 @@ if ( function_exists( 'wg_fs' ) ) {
 				) );
 			}
 
-			return $wg_fs;
+			return $geoscale_fs;
 		}
 
-		wg_fs(); // Init Freemius
-		do_action( 'wg_fs_loaded' ); // Signal that SDK was initiated
+		geoscale_fs(); // Init Freemius
+		do_action( 'geoscale_fs_loaded' ); // Signal that SDK was initiated
 	}
 
 	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';

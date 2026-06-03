@@ -134,6 +134,7 @@ class GeoScale_API {
 				GeoScale_DB::create_table();
 			}
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$wpdb->insert(
 				$tasks_table,
 				array(
@@ -259,11 +260,14 @@ class GeoScale_API {
 		}
 
 		if ( 'delete' === $action ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete( $table_name, array( 'task_id' => $task_id ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->delete( $tasks_table, array( 'id' => $task_id ) );
 			$message = 'Campaign and all associated routes deleted successfully.';
 		} else {
 			$is_active = ( 'activate' === $action ) ? 1 : 0;
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update( $table_name, array( 'is_active' => $is_active ), array( 'task_id' => $task_id ) );
 			$message = "All routes successfully " . ( 'activate' === $action ? 'activated' : 'deactivated' ) . ".";
 		}

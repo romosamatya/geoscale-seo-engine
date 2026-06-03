@@ -41,7 +41,7 @@ class GeoScale_Upsell {
 				</ul>
 				
 				<p style="margin-top: 30px;">
-					<a href="https://yourwebsite.com/pricing" target="_blank" class="button button-primary button-hero" style="background: #f56e28; border-color: #d55819;">View Plan Details & Upgrade</a>
+					<a href="https://geoscale-seo.netlify.app/" target="_blank" class="button button-primary button-hero" style="background: #f56e28; border-color: #d55819;">View Plan Details & Upgrade</a>
 				</p>
 			</div>
 		</div>
