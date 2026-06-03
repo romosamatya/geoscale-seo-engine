@@ -42,11 +42,11 @@ class GeoScale_Shortcodes {
 
 			if ( isset( $payload[ $atts['field'] ] ) ) {
 				$text = wp_kses_post( $payload[ $atts['field'] ] );
-				return class_exists( 'GeoScale_Spintax' ) ? GeoScale_Spintax::parse( $text ) : $text;
+				return class_exists( 'GeoScale_Spintax' ) ? wp_kses_post( GeoScale_Spintax::parse( $text ) ) : $text;
 			}
 		}
 
 		$fallback = wp_kses_post( $atts['default'] );
-		return class_exists( 'GeoScale_Spintax' ) ? GeoScale_Spintax::parse( $fallback ) : $fallback;
+		return class_exists( 'GeoScale_Spintax' ) ? wp_kses_post( GeoScale_Spintax::parse( $fallback ) ) : $fallback;
 	}
 }

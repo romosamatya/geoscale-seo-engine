@@ -47,7 +47,7 @@ if ( function_exists( 'wg_fs' ) ) {
 					'slug'                => 'wp-geoscale',
 					'type'                => 'plugin',
 					'public_key'          => 'pk_96c205fef23171eb3cfd72b82e77d',
-					'is_premium'          => true,
+					'is_premium'          => false,
 					'has_premium_version' => true,
 					'has_addons'          => false,
 					'has_paid_plans'      => true,
@@ -73,11 +73,9 @@ if ( function_exists( 'wg_fs' ) ) {
 	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
 	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
 	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-upsell.php';
 
-	// Conditional Pro Loader tied to Freemius License
-	if ( wg_fs()->can_use_premium_code() && file_exists( GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php' ) ) {
-		require_once GEOSCALE_PLUGIN_DIR . 'includes/pro/class-geoscale-pro.php';
-	}
+
 
 	/**
 	 * Plugin activation hook.
@@ -113,15 +111,15 @@ if ( function_exists( 'wg_fs' ) ) {
 		if ( is_admin() ) {
 			$plugin_admin = new GeoScale_Admin();
 			$plugin_admin->init();
+
+			$plugin_upsell = new GeoScale_Upsell();
+			$plugin_upsell->init();
 		}
 
 		$plugin_api = new GeoScale_API();
 		$plugin_api->init();
 
-		if ( wg_fs()->can_use_premium_code() && class_exists( 'GeoScale_Pro' ) ) {
-			$geoscale_pro = new GeoScale_Pro();
-			$geoscale_pro->init();
-		}
+
 	}
 	add_action( 'plugins_loaded', 'geoscale_run' );
 }
