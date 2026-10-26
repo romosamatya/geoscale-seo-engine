@@ -2,10 +2,10 @@ const fs = require('fs-extra');
 const AdmZip = require('adm-zip');
 const path = require('path');
 
-const pluginName = 'geoscale-free';
+const pluginName = 'geoscale';
 const rootDir = path.resolve(__dirname, '..');
 const outDir = path.join(rootDir, 'dist');
-const freeZipPath = path.join(outDir, `${pluginName}-free.zip`);
+const zipPath = path.join(outDir, `${pluginName}.zip`);
 
 async function build() {
     console.log('🧹 Cleaning old build...');
@@ -20,12 +20,12 @@ async function build() {
     const allowed = [
         'build',            // Compiled React UI
         'includes',         // PHP core
-        'vendor',           // Freemius SDK & ActionScheduler
-        'geoscale-free.php',  // Plugin bootstrapper
+        'vendor',           // ActionScheduler
+        'geoscale.php',     // Plugin bootstrapper
         'readme.txt',       // Plugin metadata
     ];
 
-    console.log('📦 Bundling free zip for WordPress.org...');
+    console.log('📦 Bundling zip for WordPress.org...');
     for (const item of allowed) {
         const itemPath = path.join(rootDir, item);
         if (fs.existsSync(itemPath)) {
@@ -40,9 +40,9 @@ async function build() {
         }
     }
 
-    console.log('💾 Writing free zip file...');
-    zip.writeZip(freeZipPath);
-    console.log(`✅ Free zip ready for WordPress.org: ${freeZipPath}`);
+    console.log('💾 Writing zip file...');
+    zip.writeZip(zipPath);
+    console.log(`✅ Zip ready for WordPress.org: ${zipPath}`);
 }
 
 build();
