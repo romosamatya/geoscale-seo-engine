@@ -21,6 +21,7 @@ async function build() {
         'build',            // Compiled React UI
         'includes',         // PHP core
         'vendor',           // ActionScheduler
+        'composer.json',    // Required by WP.org scanner when /vendor is present
         'geoscale.php',     // Plugin bootstrapper
         'readme.txt',       // Plugin metadata
     ];

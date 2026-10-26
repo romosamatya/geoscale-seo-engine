@@ -7,7 +7,7 @@
  * Author:      romosamatya
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: geoscale
+ * Text Domain: geoscale-programmatic-seo-engine
  *
  * @package GeoScale
  */

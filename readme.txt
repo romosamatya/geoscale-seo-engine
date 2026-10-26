@@ -1,7 +1,7 @@
 === GeoScale – Programmatic SEO Engine ===
 Contributors: romosamatya
 Requires at least: 5.8
-Tested up to: 7.0
+Tested up to: 7.1
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -24,7 +24,7 @@ The React-based admin UI is built using @wordpress/scripts. To regenerate the co
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/geoscale` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/geoscale-programmatic-seo-engine` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Click on the "GeoScale" menu item in the WordPress admin sidebar.
 
