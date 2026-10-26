@@ -31,95 +31,58 @@ if ( file_exists( GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once GEOSCALE_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
-if ( function_exists( 'geoscale_fs' ) ) {
-	geoscale_fs()->set_basename( true, __FILE__ );
-} else {
-	// DO NOT REMOVE THIS IF. Essential for Freemius auto-deactivate mechanics.
-	if ( ! function_exists( 'geoscale_fs' ) ) {
-		// Create a helper function for easy SDK access.
-		function geoscale_fs() {
-			global $geoscale_fs;
-
-			if ( ! isset( $geoscale_fs ) ) {
-				// SDK is auto-loaded through Composer
-				$geoscale_fs = fs_dynamic_init( array(
-					'id'                  => '30540',
-					'slug'                => 'wp-geoscale',
-					'type'                => 'plugin',
-					'public_key'          => 'pk_96c205fef23171eb3cfd72b82e77d',
-					'is_premium'          => false,
-					'has_premium_version' => true,
-					'has_addons'          => false,
-					'has_paid_plans'      => true,
-					'is_org_compliant'    => true,
-					'wp_org_gatekeeper'   => 'OA7#BoRiBNqdf52FvzEf!!074aRLPs8fspif$7K1#4u4Csys1fQlCecVcUTOs2mcpeVHi#C2j9d09fOTvbC0HloPT7fFee5WdS3G',
-					'menu'                => array(
-						'slug'           => 'wp-geoscale',
-						'first-path'     => 'admin.php?page=wp-geoscale',
-						'support'        => false,
-					),
-				) );
-			}
-
-			return $geoscale_fs;
-		}
-
-		geoscale_fs(); // Init Freemius
-		do_action( 'geoscale_fs_loaded' ); // Signal that SDK was initiated
-	}
-
-	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
-	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
-	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
-	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
-	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
-	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-upsell.php';
-
-
-
-	/**
-	 * Plugin activation hook.
-	 */
-	function geoscale_activate() {
-		GeoScale_DB::create_table();
-		
-		require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
-		$router = new GeoScale_Router();
-		$router->add_rewrite_rules();
-		flush_rewrite_rules();
-	}
-	register_activation_hook( __FILE__, 'geoscale_activate' );
-
-	/**
-	 * Plugin deactivation hook.
-	 */
-	function geoscale_deactivate() {
-		// Do not drop the table on deactivation to preserve user data.
-	}
-	register_deactivation_hook( __FILE__, 'geoscale_deactivate' );
-
-	/**
-	 * Initialize the plugin.
-	 */
-	function geoscale_run() {
-		$plugin_router = new GeoScale_Router();
-		$plugin_router->init();
-
-		$plugin_shortcodes = new GeoScale_Shortcodes();
-		$plugin_shortcodes->init();
-
-		if ( is_admin() ) {
-			$plugin_admin = new GeoScale_Admin();
-			$plugin_admin->init();
-
-			$plugin_upsell = new GeoScale_Upsell();
-			$plugin_upsell->init();
-		}
-
-		$plugin_api = new GeoScale_API();
-		$plugin_api->init();
-
-
-	}
-	add_action( 'plugins_loaded', 'geoscale_run' );
+// Action Scheduler requires explicit initialization when bundled via Composer.
+if ( file_exists( GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php' ) ) {
+	require_once GEOSCALE_PLUGIN_DIR . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 }
+
+require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-db.php';
+require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-batch.php';
+require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
+require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-shortcodes.php';
+require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-api.php';
+require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-admin.php';
+
+/**
+ * Plugin activation hook.
+ */
+function geoscale_activate() {
+	GeoScale_DB::create_table();
+
+	require_once GEOSCALE_PLUGIN_DIR . 'includes/class-geoscale-router.php';
+	$router = new GeoScale_Router();
+	$router->add_rewrite_rules();
+	flush_rewrite_rules();
+}
+register_activation_hook( __FILE__, 'geoscale_activate' );
+
+/**
+ * Plugin deactivation hook.
+ */
+function geoscale_deactivate() {
+	// Do not drop the table on deactivation to preserve user data.
+}
+register_deactivation_hook( __FILE__, 'geoscale_deactivate' );
+
+/**
+ * Initialize the plugin.
+ */
+function geoscale_run() {
+	$plugin_batch = new GeoScale_Batch();
+	$plugin_batch->init();
+
+	$plugin_router = new GeoScale_Router();
+	$plugin_router->init();
+
+	$plugin_shortcodes = new GeoScale_Shortcodes();
+	$plugin_shortcodes->init();
+
+	if ( is_admin() ) {
+		$plugin_admin = new GeoScale_Admin();
+		$plugin_admin->init();
+	}
+
+	$plugin_api = new GeoScale_API();
+	$plugin_api->init();
+}
+add_action( 'plugins_loaded', 'geoscale_run' );

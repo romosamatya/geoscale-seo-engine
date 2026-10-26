@@ -2,7 +2,7 @@
 /**
  * REST API Endpoints for React SPA.
  *
- * @package WP_GeoScale
+ * @package GeoScale
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -28,19 +28,6 @@ class GeoScale_API {
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( $this, 'handle_status' ),
 			'permission_callback' => array( $this, 'permissions_check' ),
-		) );
-
-		register_rest_route( $namespace, '/schema', array(
-			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_schema' ),
-				'permission_callback' => array( $this, 'permissions_check' ),
-			),
-			array(
-				'methods'             => WP_REST_Server::CREATABLE,
-				'callback'            => array( $this, 'save_schema' ),
-				'permission_callback' => array( $this, 'permissions_check' ),
-			),
 		) );
 
 		// V3 Routes for Tasks Management
@@ -122,8 +109,6 @@ class GeoScale_API {
 			fclose( $handle ); // phpcs:ignore
 		}
 
-
-
 		if ( $total_rows > 0 ) {
 			global $wpdb;
 			$tasks_table = GeoScale_DB::get_tasks_table_name();
@@ -182,18 +167,6 @@ class GeoScale_API {
 		) );
 	}
 
-	public function get_schema() {
-		return rest_ensure_response( array(
-			'schema' => get_option( 'geoscale_schema_template', '' )
-		) );
-	}
-
-	public function save_schema( WP_REST_Request $request ) {
-		$schema = $request->get_param( 'schema' );
-		update_option( 'geoscale_schema_template', $schema );
-		return rest_ensure_response( array( 'success' => true, 'message' => 'Schema saved successfully.' ) );
-	}
-
 	// --- V3 Task Endpoints ---
 
 	public function get_tasks() {
@@ -246,8 +219,6 @@ class GeoScale_API {
 	}
 
 	public function bulk_action( WP_REST_Request $request ) {
-
-
 		global $wpdb;
 		$table_name = GeoScale_DB::get_table_name();
 		$tasks_table = GeoScale_DB::get_tasks_table_name();

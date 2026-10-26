@@ -11,14 +11,9 @@ Generate thousands of geo-targeted landing pages from a CSV upload — without c
 
 == Description ==
 
-GeoScale is an advanced programmatic SEO engine designed for WordPress. Instead of creating thousands of physical posts (which slows down your database), GeoScale uses virtual routing to intercept URLs and render dynamic content on the fly.
+GeoScale is a programmatic SEO engine designed for WordPress. Instead of creating thousands of physical posts (which slows down your database), GeoScale uses virtual routing to intercept URLs and render dynamic content on the fly.
 
-Simply upload a CSV with your location data, configure a master template, and GeoScale will instantly generate thousands of perfectly optimized landing pages complete with dynamic JSON-LD Schema.
-
-### Premium Features
-* **Spintax Engine**: Generate unique content variations automatically.
-* **Dynamic Schema Generation**: Output perfectly structured JSON-LD for LocalBusiness and Services.
-* **Bulk Actions**: Batch process and map variables at an enterprise scale.
+Simply upload a CSV with your location data, configure a master template, and GeoScale will instantly generate virtual landing pages using dynamic shortcodes.
 
 == Source Code ==
 
@@ -29,7 +24,7 @@ The React-based admin UI is built using @wordpress/scripts. To regenerate the co
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/geoscale-programmatic-seo-engine` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/geoscale-free` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Click on the "GeoScale" menu item in the WordPress admin sidebar.
 

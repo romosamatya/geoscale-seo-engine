@@ -4,9 +4,8 @@ const { root, nonce } = window.geoscaleApiData || { root: '', nonce: '' };
 
 export const fetchTaskRoutes = createAsyncThunk(
     'routes/fetchTaskRoutes',
-    async ({ taskId, page = 1, search = '' }, { getState, rejectWithValue }) => {
+    async ({ taskId, page = 1, search = '' }, { rejectWithValue }) => {
         try {
-            const { isPremium } = getState().license;
             const url = new URL(`${root}geoscale/v1/tasks/${taskId}/routes`);
             url.searchParams.append('page', page);
             if (search) url.searchParams.append('search', search);
@@ -14,7 +13,6 @@ export const fetchTaskRoutes = createAsyncThunk(
             const response = await fetch(url, { 
                 headers: { 
                     'X-WP-Nonce': nonce,
-                    'X-GeoScale-Tier': isPremium ? 'Pro' : 'Free'
                 } 
             });
             const data = await response.json();

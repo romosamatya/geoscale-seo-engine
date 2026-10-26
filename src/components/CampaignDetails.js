@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTaskRoutes, setCurrentPage } from '../store/routesSlice';
-import { setActiveTask, fetchTasks } from '../store/tasksSlice';
-import CampaignBulkActions from '../pro/CampaignBulkActions';
+import { setActiveTask, fetchTasks, bulkActionTask } from '../store/tasksSlice';
 
 const CampaignDetails = () => {
     const dispatch = useDispatch();
@@ -17,6 +16,18 @@ const CampaignDetails = () => {
         }
     }, [dispatch, activeTaskId, currentPage, search]);
 
+    const handleBulkAction = async (action) => {
+        if (window.confirm(`Are you sure you want to ${action} all routes in this campaign?`)) {
+            await dispatch(bulkActionTask({ taskId: activeTaskId, action }));
+            if (action === 'delete') {
+                dispatch(setActiveTask(null));
+                dispatch(fetchTasks());
+            } else {
+                dispatch(fetchTaskRoutes({ taskId: activeTaskId, page: currentPage, search }));
+            }
+        }
+    };
+
     return (
         <div style={{ background: '#fff', padding: '20px', border: '1px solid #ccd0d4', boxShadow: '0 1px 1px rgba(0,0,0,.04)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -25,7 +36,11 @@ const CampaignDetails = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <CampaignBulkActions activeTaskId={activeTaskId} currentPage={currentPage} search={search} />
+                <div>
+                    <button className="button" style={{ marginRight: '10px' }} onClick={() => handleBulkAction('activate')}>Activate All</button>
+                    <button className="button" style={{ marginRight: '10px' }} onClick={() => handleBulkAction('deactivate')}>Deactivate All</button>
+                    <button className="button" style={{ color: '#d63638', borderColor: '#d63638' }} onClick={() => handleBulkAction('delete')}>Delete Campaign</button>
+                </div>
                 <div>
                     <input 
                         type="search" 

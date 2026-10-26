@@ -35,7 +35,7 @@ class GeoScale_Admin {
 
 		$asset_file_path = GEOSCALE_PLUGIN_DIR . 'build/index.asset.php';
 		if ( ! file_exists( $asset_file_path ) ) {
-			return; // React build not found
+			return; // React build not found.
 		}
 
 		$asset_file = require $asset_file_path;
@@ -49,9 +49,8 @@ class GeoScale_Admin {
 		);
 
 		wp_localize_script( 'geoscale-react-app', 'geoscaleApiData', array(
-			'root'       => esc_url_raw( rest_url() ),
-			'nonce'      => wp_create_nonce( 'wp_rest' ),
-			'is_premium' => wg_fs()->can_use_premium_code(),
+			'root'  => esc_url_raw( rest_url() ),
+			'nonce' => wp_create_nonce( 'wp_rest' ),
 		) );
 	}
 

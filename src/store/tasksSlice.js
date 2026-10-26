@@ -4,13 +4,11 @@ const { root, nonce } = window.geoscaleApiData || { root: '', nonce: '' };
 
 export const fetchTasks = createAsyncThunk(
     'tasks/fetchTasks',
-    async (_, { getState, rejectWithValue }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            const { isPremium } = getState().license;
             const response = await fetch(`${root}geoscale/v1/tasks`, {
                 headers: { 
                     'X-WP-Nonce': nonce,
-                    'X-GeoScale-Tier': isPremium ? 'Pro' : 'Free'
                 }
             });
             const data = await response.json();
@@ -24,15 +22,13 @@ export const fetchTasks = createAsyncThunk(
 
 export const bulkActionTask = createAsyncThunk(
     'tasks/bulkActionTask',
-    async ({ taskId, action }, { getState, rejectWithValue }) => {
+    async ({ taskId, action }, { rejectWithValue }) => {
         try {
-            const { isPremium } = getState().license;
             const response = await fetch(`${root}geoscale/v1/tasks/bulk-action`, {
                 method: 'POST',
                 headers: {
                     'X-WP-Nonce': nonce,
                     'Content-Type': 'application/json',
-                    'X-GeoScale-Tier': isPremium ? 'Pro' : 'Free'
                 },
                 body: JSON.stringify({ task_id: taskId, action })
             });

@@ -2,7 +2,7 @@
 /**
  * Shortcode engine for dynamic content.
  *
- * @package WP_GeoScale
+ * @package GeoScale
  */
 
 // If this file is called directly, abort.
@@ -23,7 +23,7 @@ class GeoScale_Shortcodes {
 	 * Render the [geoscale] shortcode.
 	 * Example usage: [geoscale field="city_name" default="Anywhere"]
 	 *
-	 * @param array $atts
+	 * @param array $atts Shortcode attributes.
 	 * @return string
 	 */
 	public function render_shortcode( $atts ) {
@@ -36,17 +36,15 @@ class GeoScale_Shortcodes {
 			return '';
 		}
 
-		// Ensure we are on a virtual route and the payload exists in memory
+		// Ensure we are on a virtual route and the payload exists in memory.
 		if ( ! empty( GeoScale_Router::$current_route_data ) && ! empty( GeoScale_Router::$current_route_data->payload ) ) {
 			$payload = GeoScale_Router::$current_route_data->payload;
 
 			if ( isset( $payload[ $atts['field'] ] ) ) {
-				$text = wp_kses_post( $payload[ $atts['field'] ] );
-				return class_exists( 'GeoScale_Spintax' ) ? wp_kses_post( GeoScale_Spintax::parse( $text ) ) : $text;
+				return wp_kses_post( $payload[ $atts['field'] ] );
 			}
 		}
 
-		$fallback = wp_kses_post( $atts['default'] );
-		return class_exists( 'GeoScale_Spintax' ) ? wp_kses_post( GeoScale_Spintax::parse( $fallback ) ) : $fallback;
+		return wp_kses_post( $atts['default'] );
 	}
 }
